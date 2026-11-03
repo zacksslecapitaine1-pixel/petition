@@ -24,10 +24,11 @@ npm run dev
 ```
 
 ## Déployer sur GitHub Pages
-1. Créer un dépôt GitHub et y pousser ce dossier (branche `main`).
-2. Dépôt → Settings → Pages → Source : **GitHub Actions**.
-3. Le workflow `.github/workflows/deploy.yml` construit et publie le site automatiquement.
-   Adresse : `https://<compte>.github.io/<depot>/` (le site utilise des chemins relatifs).
+- La branche `main` contient le code source.
+- La branche `master` contient uniquement le site compilé (`npm run build`, contenu du dossier `dist`).
+- Réglage : Settings → Pages → Build and deployment → « Deploy from a branch » → branche `master`, dossier `/ (root)`.
+- Pour mettre à jour le site : `npm run build`, puis copier le contenu de `dist` (et un fichier `.nojekyll`) dans `master`.
+  Adresse : `https://<compte>.github.io/petition/` (le site utilise des chemins relatifs).
 
 ## Configuration
 Tout se règle dans `src/lib/config.js` (texte de la lettre, noms des filières, clés Supabase).
