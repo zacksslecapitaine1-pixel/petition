@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg: #12070b;
   --bg2: #1b0a10;
   --ink: #fbf3e8;
@@ -323,3 +324,8 @@ table.p-sum { width: 100%; border-collapse: collapse; margin-top: 2mm; font-size
 .doc-bar label.opt { display: inline-flex; gap: 8px; align-items: center; color: var(--muted); font-size: 14px; cursor: pointer; }
 .doc-bar label.opt input { width: 18px; height: 18px; accent-color: var(--gold); }
 .p-tbl td.tel { width: 32mm; text-align: center; font-size: 9pt; white-space: nowrap; }
+
+.demo-bar { position: fixed; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 70; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center; max-width: calc(100% - 24px); background: rgba(20,8,13,.92); border: 1px solid var(--glass-b); border-radius: 16px; padding: 7px 10px; font-size: 12.5px; color: var(--muted); backdrop-filter: blur(10px); box-shadow: 0 14px 40px rgba(0,0,0,.5); }
+.demo-bar b { color: var(--gold); }
+.demo-bar a { color: var(--ink); text-decoration: none; background: rgba(255,255,255,.1); padding: 5px 10px; border-radius: 10px; font-weight: 600; }
+.demo-bar a:hover { background: rgba(255,255,255,.2); }

@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_KEY } from './config';
+import { SUPABASE_URL, SUPABASE_KEY, DEMO } from './config';
+import { ApiError } from './apiError';
+import * as demo from './demo';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -19,12 +21,7 @@ const MESSAGES = {
   weak_password: 'Mot de passe trop court (8 caractères minimum).',
 };
 
-export class ApiError extends Error {
-  constructor(code, message) {
-    super(message);
-    this.code = code;
-  }
-}
+export { ApiError };
 
 function toError(error) {
   const raw = (error && (error.message || error.details)) || '';
@@ -43,7 +40,7 @@ async function rpc(name, args) {
   return data;
 }
 
-export const submitSignature = (payload) =>
+export const submitSignature = DEMO ? demo.submitSignature : (payload) =>
   rpc('submit_signature', {
     p_filiere: payload.filiere,
     p_nom: payload.nom,
@@ -54,7 +51,7 @@ export const submitSignature = (payload) =>
     p_signature: payload.signature,
   });
 
-export const getStats = () => rpc('get_public_stats', {});
-export const adminLogin = (password) => rpc('admin_login', { p_password: clean(password) });
-export const adminList = (password) => rpc('admin_list_full', { p_password: clean(password) });
-export const adminSetPassword = (oldPw, newPw) => rpc('admin_set_password', { p_old: clean(oldPw), p_new: clean(newPw) });
+export const getStats = DEMO ? demo.getStats : () => rpc('get_public_stats', {});
+export const adminLogin = DEMO ? demo.adminLogin : (password) => rpc('admin_login', { p_password: clean(password) });
+export const adminList = DEMO ? demo.adminList : (password) => rpc('admin_list_full', { p_password: clean(password) });
+export const adminSetPassword = DEMO ? demo.adminSetPassword : (oldPw, newPw) => rpc('admin_set_password', { p_old: clean(oldPw), p_new: clean(newPw) });

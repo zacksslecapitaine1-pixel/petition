@@ -6,6 +6,7 @@ import { normalizePhone } from './lib/hooks';
 import Admin from './admin/Admin';
 import { submitSignature } from './lib/api';
 import { useHash } from './lib/hooks';
+import { DEMO } from './lib/config';
 
 const ORDER = ['home', 'filiere', 'context', 'nom', 'prenom', 'genre', 'telephone', 'position', 'signature', 'recap'];
 const PROGRESS_STEPS = ORDER.slice(1); // 9 étapes
@@ -126,6 +127,13 @@ export default function App() {
     <>
       <Background />
       {isAdmin ? <Admin /> : <Petition />}
+      {DEMO && (
+        <div className="demo-bar no-print">
+          <span><b>Aperçu</b> · données fictives, rien n’est enregistré</span>
+          <a href="#/">Site</a>
+          <a href="#/admin">Admin (mot de passe : demo)</a>
+        </div>
+      )}
     </>
   );
 }

@@ -9,6 +9,9 @@ export const SUPABASE_URL =
 export const SUPABASE_KEY =
   import.meta.env.VITE_SUPABASE_KEY || 'sb_publishable_05X2Adm-qpye2SoIv692AA_fjZbOHFi';
 
+// Version démo (aperçu autonome, données fictives, aucun appel réseau)
+export const DEMO = import.meta.env.VITE_DEMO === '1';
+
 export const CLASS_NAME = 'Licence 1 Informatique (DA-IA) – Groupe 1';
 export const SITE = 'Addidogomé';
 export const SCHOOL = 'ESGIS';

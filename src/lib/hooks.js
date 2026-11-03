@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getStats } from './api';
+import { DEMO } from './config';
 
 export function useCountUp(target, duration = 900) {
   const [val, setVal] = useState(0);
@@ -45,11 +46,20 @@ export function useStats(interval = 15000) {
 }
 
 export function useHash() {
-  const [hash, setHash] = useState(window.location.hash);
+  const [hash, setHash] = useState(DEMO ? '' : window.location.hash);
   useEffect(() => {
     const on = () => setHash(window.location.hash);
     window.addEventListener('hashchange', on);
-    return () => window.removeEventListener('hashchange', on);
+    // Aperçu : la navigation reste interne à la page (pas de dépendance à l'adresse)
+    const click = (e) => {
+      const a = e.target.closest && e.target.closest('a[href^="#/"]');
+      if (!a) return;
+      e.preventDefault();
+      setHash(a.getAttribute('href'));
+      window.scrollTo(0, 0);
+    };
+    if (DEMO) document.addEventListener('click', click);
+    return () => { window.removeEventListener('hashchange', on); if (DEMO) document.removeEventListener('click', click); };
   }, []);
   return hash;
 }

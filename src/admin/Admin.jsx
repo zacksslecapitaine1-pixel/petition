@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, LogOut, RefreshCw, Printer, Download, Search, ShieldCheck, ArrowLeft, KeyRound, Check, X } from 'lucide-react';
 import { adminLogin, adminList, adminSetPassword } from '../lib/api';
-import { FILIERES } from '../lib/config';
+import { FILIERES, DEMO } from '../lib/config';
 import { useCountUp, formatPhone } from '../lib/hooks';
 import PrintReport, { computeStats, fmtDate } from './PrintReport';
 
@@ -108,7 +108,7 @@ function Dashboard({ pw, onLogout, onPwChanged }) {
           <div><div className="eyebrow">Espace administrateur</div><h1>Tableau de bord</h1></div>
           <div className="row">
             <button className="btn ghost small" onClick={() => load(false)}><RefreshCw size={15} className={loading ? 'spin' : ''} /> Actualiser</button>
-            <button className="btn gold small" onClick={printNow}><Printer size={15} /> Imprimer / PDF</button>
+            {!DEMO && <button className="btn gold small" onClick={printNow}><Printer size={15} /> Imprimer / PDF</button>}
             <a className="btn ghost small" href="#/"><ArrowLeft size={15} /> Site</a>
             <button className="btn ghost small" onClick={onLogout}><LogOut size={15} /> Quitter</button>
           </div>
@@ -149,7 +149,7 @@ function Dashboard({ pw, onLogout, onPwChanged }) {
                 <option value="all">Toutes les filières</option>
                 {Object.values(FILIERES).map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
               </select>
-              <button className="btn ghost small" onClick={exportCsv} disabled={!rows.length}><Download size={15} /> CSV</button>
+              {!DEMO && <button className="btn ghost small" onClick={exportCsv} disabled={!rows.length}><Download size={15} /> CSV</button>}
             </div>
 
             <div className="tbl-wrap">
@@ -181,8 +181,8 @@ function Dashboard({ pw, onLogout, onPwChanged }) {
           <div className="no-print doc-bar">
             <label style={{ color: 'var(--muted)', fontSize: 14 }}>Date du document : <input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
             <label className="opt"><input type="checkbox" checked={includePhone} onChange={(e) => setIncludePhone(e.target.checked)} /> Inclure les numéros de téléphone dans le PDF</label>
-            <button className="btn gold small" onClick={() => window.print()}><Printer size={15} /> Imprimer / Enregistrer en PDF</button>
-            <span style={{ color: 'var(--dim)', fontSize: 13 }}>Dans la fenêtre d’impression, choisissez « Enregistrer au format PDF » (A4, marges par défaut).</span>
+            {!DEMO && <button className="btn gold small" onClick={() => window.print()}><Printer size={15} /> Imprimer / Enregistrer en PDF</button>}
+            <span style={{ color: 'var(--dim)', fontSize: 13 }}>{DEMO ? 'Aperçu du document remis à l’administration (sur le vrai site : bouton Imprimer / PDF).' : 'Dans la fenêtre d’impression, choisissez « Enregistrer au format PDF » (A4, marges par défaut).'}</span>
           </div>
         )}
 
