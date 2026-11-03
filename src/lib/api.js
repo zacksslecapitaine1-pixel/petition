@@ -51,6 +51,7 @@ export const submitSignature = DEMO ? demo.submitSignature : (payload) =>
     p_signature: payload.signature,
   });
 
+export const getDashboard = DEMO ? demo.getDashboard : () => rpc('get_public_dashboard', {});
 export const getStats = DEMO ? demo.getStats : () => rpc('get_public_stats', {});
 export const adminLogin = DEMO ? demo.adminLogin : (password) => rpc('admin_login', { p_password: clean(password) });
 export const adminList = DEMO ? demo.adminList : (password) => rpc('admin_list_full', { p_password: clean(password) });

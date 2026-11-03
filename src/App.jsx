@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { FileText } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Background from './components/Background';
 import { HomeStep, FiliereStep, ContextStep, TextStep, GenreStep, PhoneStep, PositionStep, SignatureStep, RecapStep, DoneStep } from './steps/Steps';
 import { normalizePhone } from './lib/hooks';
 import Admin from './admin/Admin';
+import PublicDashboard from './steps/Dashboard';
+import { LetterModal } from './components/Letter';
 import { submitSignature } from './lib/api';
-import { useHash } from './lib/hooks';
 import { DEMO } from './lib/config';
 
 const ORDER = ['home', 'filiere', 'context', 'nom', 'prenom', 'genre', 'telephone', 'position', 'signature', 'recap'];
@@ -39,7 +41,7 @@ function Progress({ step }) {
   );
 }
 
-function Petition() {
+function Petition({ onAdmin }) {
   const [step, setStep] = useState('home');
   const [dir, setDir] = useState(1);
   const [data, setData] = useState(() => {
@@ -50,6 +52,18 @@ function Petition() {
   const [entry, setEntry] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [letterOpen, setLetterOpen] = useState(false);
+
+  // Accès administrateur caché : 7 touches rapprochées sur le logo.
+  const taps = useRef({ n: 0, reset: null, home: null });
+  const onLogo = () => {
+    const t = taps.current;
+    t.n += 1;
+    clearTimeout(t.reset); clearTimeout(t.home);
+    if (t.n >= 7) { t.n = 0; onAdmin(); return; }
+    t.reset = setTimeout(() => { t.n = 0; }, 1500);
+    if (t.n === 1) t.home = setTimeout(() => { if (taps.current.n === 1) go('home', -1); }, 700);
+  };
 
   useEffect(() => {
     const { signature, ...draft } = data;
@@ -88,7 +102,7 @@ function Petition() {
 
   let view;
   switch (step) {
-    case 'home': view = <HomeStep onStart={() => go('filiere')} done={done} onShowCard={() => { setEntry(done); go('done'); }} />; break;
+    case 'home': view = <HomeStep onStart={() => go('filiere')} done={done} onShowCard={() => { setEntry(done); go('done'); }} onDashboard={() => go('dashboard')} />; break;
     case 'filiere': view = <FiliereStep value={data.filiere} onBack={prev} onPick={(f) => { set({ filiere: f }); setTimeout(() => go('context'), 380); }} />; break;
     case 'context': view = <ContextStep onBack={prev} onNext={next} />; break;
     case 'nom': view = <TextStep eyebrow="Étape 3" title={<>Quel est votre <em>nom</em> ?</>} label="Nom de famille" placeholder="Ex. AGBODJAN" upper autoComplete="family-name" value={data.nom} onChange={(v) => set({ nom: v })} onBack={prev} onNext={next} />; break;
@@ -98,15 +112,17 @@ function Petition() {
     case 'position': view = <PositionStep value={data.position} onBack={prev} onPick={(p) => { set({ position: p }); setTimeout(() => go('signature'), 350); }} />; break;
     case 'signature': view = <SignatureStep value={data.signature} onChange={(s) => set({ signature: s || '' })} onBack={prev} onNext={next} />; break;
     case 'recap': view = <RecapStep data={data} loading={loading} error={error} onBack={prev} onSubmit={submit} />; break;
-    case 'done': view = entry ? <DoneStep entry={entry} onAnother={another} /> : null; break;
+    case 'done': view = entry ? <DoneStep entry={entry} onAnother={another} onDashboard={() => go('dashboard')} onLetter={() => setLetterOpen(true)} /> : null; break;
+    case 'dashboard': view = <PublicDashboard onBack={() => go(entry ? 'done' : 'home', -1)} myNumber={(entry || done)?.numero} />; break;
     default: view = null;
   }
 
   return (
     <div className="app">
       <header className="topbar">
-        <a className="logo-pill" href="#/" onClick={() => go('home', -1)} aria-label="Accueil"><img src="./logo.png" alt="ESGIS" /></a>
+        <button type="button" className="logo-pill" onClick={onLogo} aria-label="ESGIS"><img src="./logo.png" alt="ESGIS" draggable="false" /></button>
         <Progress step={step} />
+        <button type="button" className="btn ghost small letter-btn" onClick={() => setLetterOpen(true)} aria-label="Lire la lettre"><FileText size={16} /> <span>Lire la lettre</span></button>
       </header>
       <main className="stage">
         <AnimatePresence mode="wait" custom={dir} initial={false}>
@@ -115,23 +131,23 @@ function Petition() {
           </motion.div>
         </AnimatePresence>
       </main>
-      <footer className="footer">Pétition de classe · Licence 1 Informatique · ESGIS · <a href="#/admin">Espace administrateur</a></footer>
+      <footer className="footer">Pétition de classe · Licence 1 Informatique · ESGIS</footer>
+      <LetterModal open={letterOpen} onClose={() => setLetterOpen(false)} />
     </div>
   );
 }
 
 export default function App() {
-  const hash = useHash();
-  const isAdmin = hash.startsWith('#/admin');
+  // L'espace administrateur n'a ni adresse ni lien : il s'ouvre uniquement via les 7 touches sur le logo.
+  const [adminOpen, setAdminOpen] = useState(false);
   return (
     <>
       <Background />
-      {isAdmin ? <Admin /> : <Petition />}
+      {adminOpen ? <Admin onExit={() => setAdminOpen(false)} /> : <Petition onAdmin={() => setAdminOpen(true)} />}
       {DEMO && (
         <div className="demo-bar no-print">
           <span><b>Aperçu</b> · données fictives, rien n’est enregistré</span>
-          <a href="#/">Site</a>
-          <a href="#/admin">Admin (mot de passe : demo)</a>
+          <span>Espace admin : touchez 7 fois le logo ESGIS · mot de passe « demo »</span>
         </div>
       )}
     </>

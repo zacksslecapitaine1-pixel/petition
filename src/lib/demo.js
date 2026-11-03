@@ -60,3 +60,16 @@ const check = (pw) => { if (String(pw).trim().toLowerCase() !== DEMO_PASSWORD) t
 export async function adminLogin(pw) { await wait(300); check(pw); return true; }
 export async function adminList(pw) { check(pw); return db().slice(); }
 export async function adminSetPassword() { throw new ApiError('demo', 'Indisponible dans l’aperçu.'); }
+
+export async function getDashboard() {
+  const d = db();
+  const by = (f) => { const l = d.filter((r) => r.filiere === f); return { total: l.length, pour: l.filter((r) => r.position === 'pour').length, contre: l.filter((r) => r.position === 'contre').length }; };
+  const days = {};
+  d.forEach((r) => { const k = r.created_at.slice(0, 10); days[k] = (days[k] || 0) + 1; });
+  return {
+    total: d.length, pour: d.filter((r) => r.position === 'pour').length, contre: d.filter((r) => r.position === 'contre').length,
+    hommes: d.filter((r) => r.genre === 'homme').length, femmes: d.filter((r) => r.genre === 'femme').length,
+    ia_bigdata: by('ia_bigdata'), dev_web: by('dev_web'),
+    days: Object.keys(days).sort().map((k) => ({ d: k, n: days[k] })),
+  };
+}

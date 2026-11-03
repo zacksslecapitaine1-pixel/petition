@@ -15,7 +15,7 @@ const Stat = ({ label, value, cls }) => {
   return <div className={`stat ${cls || ''}`}><small>{label}</small><b>{v}</b></div>;
 };
 
-function Login({ onOk }) {
+function Login({ onOk, onExit }) {
   const [pw, setPwInput] = useState('');
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ function Login({ onOk }) {
           <input className="pw-input" type="password" placeholder="Mot de passe" value={pw} onChange={(e) => setPwInput(e.target.value)} autoFocus autoComplete="current-password" />
           {err && <div className="err">{err}</div>}
           <button className="btn primary" disabled={!pw || loading}>{loading ? <span className="spinner" /> : <><ShieldCheck size={18} /> Se connecter</>}</button>
-          <a className="back" href="#/" style={{ justifyContent: 'center' }}><ArrowLeft size={14} /> Retour au site</a>
+          <button type="button" className="back" onClick={onExit} style={{ justifyContent: 'center', width: '100%' }}><ArrowLeft size={14} /> Retour au site</button>
         </div>
       </motion.form>
     </div></div>
@@ -67,7 +67,7 @@ function SettingsTab({ pw, onChanged }) {
   );
 }
 
-function Dashboard({ pw, onLogout, onPwChanged }) {
+function Dashboard({ pw, onLogout, onPwChanged, onExit }) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -109,8 +109,8 @@ function Dashboard({ pw, onLogout, onPwChanged }) {
           <div className="row">
             <button className="btn ghost small" onClick={() => load(false)}><RefreshCw size={15} className={loading ? 'spin' : ''} /> Actualiser</button>
             {!DEMO && <button className="btn gold small" onClick={printNow}><Printer size={15} /> Imprimer / PDF</button>}
-            <a className="btn ghost small" href="#/"><ArrowLeft size={15} /> Site</a>
-            <button className="btn ghost small" onClick={onLogout}><LogOut size={15} /> Quitter</button>
+            <button className="btn ghost small" onClick={onExit}><ArrowLeft size={15} /> Site</button>
+            <button className="btn ghost small" onClick={() => { onLogout(); onExit(); }}><LogOut size={15} /> Quitter</button>
           </div>
         </div>
 
@@ -206,7 +206,7 @@ function Dashboard({ pw, onLogout, onPwChanged }) {
   );
 }
 
-export default function Admin() {
+export default function Admin({ onExit }) {
   const [pw, setPwState] = useState(getPw());
   const [checking, setChecking] = useState(!!getPw());
 
@@ -221,6 +221,6 @@ export default function Admin() {
 
   const logout = useCallback(() => { setPw(''); setPwState(''); }, []);
   if (checking) return <div className="admin"><div className="admin-in" style={{ textAlign: 'center', paddingTop: '30vh' }}><span className="spinner" /></div></div>;
-  if (!pw) return <Login onOk={setPwState} />;
-  return <Dashboard pw={pw} onLogout={logout} onPwChanged={setPwState} />;
+  if (!pw) return <Login onOk={setPwState} onExit={onExit} />;
+  return <Dashboard pw={pw} onLogout={logout} onPwChanged={setPwState} onExit={onExit} />;
 }

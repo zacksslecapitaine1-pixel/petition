@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getStats } from './api';
+import { getStats, getDashboard } from './api';
 import { DEMO } from './config';
 
 export function useCountUp(target, duration = 900) {
@@ -80,4 +80,20 @@ export function formatPhone(p) {
   if (!p) return '';
   const m = /^\+228([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/.exec(p);
   return m ? `+228 ${m[1]} ${m[2]} ${m[3]} ${m[4]}` : p;
+}
+
+export function useDashboard(interval = 15000) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      try { const d = await getDashboard(); if (alive) { setData(d); setError(false); } }
+      catch { if (alive) setError(true); }
+    };
+    load();
+    const id = setInterval(() => !document.hidden && load(), interval);
+    return () => { alive = false; clearInterval(id); };
+  }, [interval]);
+  return { data, error };
 }

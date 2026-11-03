@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import {
-  ArrowLeft, ArrowRight, Check, X, Clock, CalendarX2, Vote, Share2, Link2, UserPlus, Loader2, AlertCircle, PenLine, Sparkles, MessageCircle, Phone, ShieldCheck, User, UserRound,
+  ArrowLeft, ArrowRight, Check, X, Clock, CalendarX2, Vote, Share2, Link2, UserPlus, Loader2, AlertCircle, PenLine, Sparkles, MessageCircle, Phone, ShieldCheck, User, UserRound, BarChart3, FileText,
 } from 'lucide-react';
 import WeekViz from '../components/WeekViz';
 import SignaturePad from '../components/SignaturePad';
@@ -15,7 +15,7 @@ const Back = ({ onClick }) => (
 );
 
 /* ------------------------------ ACCUEIL ------------------------------ */
-export function HomeStep({ onStart, done, onShowCard }) {
+export function HomeStep({ onStart, done, onShowCard, onDashboard }) {
   const [mode, setMode] = useState('now');
   const stats = useStats();
   const count = useCountUp(stats?.total ?? 0);
@@ -37,6 +37,7 @@ export function HomeStep({ onStart, done, onShowCard }) {
         <motion.div className="row" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}>
           <button className="btn primary big" onClick={onStart}>Je participe <ArrowRight size={20} /></button>
           {done && <button className="btn ghost" onClick={onShowCard}>Revoir ma carte (N° {pad(done.numero)})</button>}
+          {done && <button className="btn ghost" onClick={onDashboard}><BarChart3 size={18} /> Voir le tableau de bord</button>}
         </motion.div>
         <div className="spacer" />
         <motion.div className="row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
@@ -246,7 +247,7 @@ export function RecapStep({ data, onSubmit, onBack, loading, error }) {
 }
 
 /* ------------------------------ SUCCÈS ------------------------------ */
-export function DoneStep({ entry, onAnother }) {
+export function DoneStep({ entry, onAnother, onDashboard, onLetter }) {
   const num = useCountUp(entry.numero, 1200);
   const stats = useStats(8000);
   const [toast, setToast] = useState('');
@@ -292,7 +293,13 @@ export function DoneStep({ entry, onAnother }) {
         <button className="btn gold" onClick={share}><MessageCircle size={18} /> Inviter la classe</button>
         <button className="btn ghost" onClick={copy}><Link2 size={18} /> Copier le lien</button>
       </div>
+      <motion.button className="dash-cta" onClick={onDashboard} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} whileTap={{ scale: 0.98 }}>
+        <span className="ic"><BarChart3 size={22} /></span>
+        <span><b>Voir le tableau de bord</b><small>Les statistiques de la pétition et la lettre remise à l’administration</small></span>
+        <ArrowRight size={20} />
+      </motion.button>
       <div className="row" style={{ justifyContent: 'center', marginTop: 14 }}>
+        <button className="btn ghost small" onClick={onLetter}><FileText size={16} /> Lire la lettre</button>
         <button className="btn ghost small" onClick={onAnother}><UserPlus size={16} /> Enregistrer un autre camarade</button>
       </div>
       {toast && <div className="toast">{toast}</div>}
